@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Printable Report: Adolescent Gender Identity Data Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!--
+    CONFIRMATION: NEITHER Mermaid JS NOR SVG were used anywhere in this output.
+    
+    PALETTE NAME: "Energetic & Playful" (Adjusted for Print Accessibility)
+    
+    NARRATIVE PLAN:
+    1. Introduction: Contextualize the shift from rare clinical presentation to widespread adolescent phenomenon.
+    2. Data Visuals: Present Referral Surges, Demographic Reversals, and Mental Health correlations.
+    3. The Print Layer: Use @media print to strip away ink-heavy elements while maintaining chart integrity.
+    4. Sourcing: Cite the NHS Cass Review, the Dutch Protocol origins, and US/European health registry data.
+    
+    CHART SELECTION:
+    - Referral Trend -> Line Chart (Chart.js)
+    - AFAB/AMAB Shift -> Stacked Bar (Chart.js)
+    - Age Breakdown -> Donut Chart (Chart.js)
+    - Comorbidities -> Horizontal Bar (Chart.js)
+    -->
+
+    <style>
+        :root {
+            --primary: #1E3A8A;
+            --secondary: #0D9488;
+            --accent: #E11D48;
+            --bg-main: #F8FAFC;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: #1E293B;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+
+        .source-link {
+            color: var(--primary);
+            text-decoration: underline;
+            font-size: 0.85rem;
+        }
+
+        @media print {
+            @page {
+                margin: 1.5cm;
+            }
+
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .glass-card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                background: white !important;
+                break-inside: avoid;
+                margin-bottom: 2rem;
+            }
+
+            header {
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+                border-bottom: 2px solid black;
+            }
+
+            header h1,
+            header p {
+                color: black !important;
+            }
+
+            .grid {
+                display: block !important;
+            }
+
+            .chart-container {
+                height: 300px !important;
+                width: 100% !important;
+            }
+
+            .print-only-title {
+                display: block !important;
+                font-weight: bold;
+                margin-bottom: 1rem;
+                font-size: 1.5rem;
+            }
+
+            footer {
+                border-top: 1px solid #ccc;
+                background: white !important;
+                color: #333 !important;
+            }
+        }
+
+        .print-only-title {
+            display: none;
+        }
+
+        .worksheet-hidden {
+            display: none;
+        }
+
+        .prompt-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1E3A8A;
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+
+        .student-input {
+            width: 100%;
+            min-height: 84px;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.75rem;
+            font-size: 0.95rem;
+            color: #0f172a;
+            background: #ffffff;
+            resize: vertical;
+        }
+
+        .student-input:focus {
+            outline: 2px solid #1E3A8A;
+            outline-offset: 1px;
+        }
+
+        .teacher-dialog {
+            border: 0;
+            border-radius: 0.75rem;
+            padding: 0;
+            width: min(92vw, 420px);
+            box-shadow: 0 20px 48px rgba(15, 23, 42, 0.3);
+        }
+
+        .teacher-dialog::backdrop {
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        @media (max-width: 1024px) {
+            .chart-container {
+                height: 280px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            #topBar {
+                padding: 0.75rem 1rem;
+            }
+
+            #topBarTitle {
+                width: 100%;
+            }
+
+            #topBarControls {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            #topBarControls button {
+                flex: 1 1 45%;
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen">
+
+    <div id="topBar"
+        class="no-print sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b px-6 py-3 flex items-center justify-between gap-3 shadow-sm">
+        <span id="topBarTitle" class="font-bold text-[#1E3A8A]">Interactive Research Overview</span>
+        <div id="topBarControls" class="flex items-center gap-2">
+            <button id="toggleWorksheetBtn"
+                class="bg-[#1E3A8A] text-white px-3 py-2 rounded-lg font-semibold text-sm hover:bg-blue-800 transition-colors">
+                Worksheet Mode
+            </button>
+            <button id="toggleTeacherBtn"
+                class="bg-teal-700 text-white px-3 py-2 rounded-lg font-semibold text-sm hover:bg-teal-800 transition-colors">
+                Teacher View
+            </button>
+            <button id="downloadAnswersBtn"
+                class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg font-semibold text-sm border hover:bg-slate-200 transition-colors">
+                Download PDF
+            </button>
+            <button id="clearAnswersBtn"
+                class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg font-semibold text-sm border hover:bg-slate-200 transition-colors">
+                Clear
+            </button>
+        </div>
+    </div>
+
+    <header class="bg-[#1E3A8A] text-white py-12 md:py-16 px-5 md:px-8 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto relative z-10">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4">Adolescent Gender Identity: A Decadal Data Overview</h1>
+            <p class="text-lg md:text-xl font-light text-blue-100 max-w-2xl leading-relaxed">
+                Reviewing referral patterns, demographic distributions, and co-occurring clinical indicators in selected
+                Western pediatric healthcare datasets.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 md:px-6 py-10 md:py-12">
+        <section id="worksheetPanel" class="worksheet-hidden mb-12 glass-card bg-amber-50 border border-amber-200 rounded-xl p-6">
+            <h2 class="text-2xl font-bold text-[#1E3A8A] mb-4">Student Worksheet (B1 English)</h2>
+            <p class="text-sm text-slate-700 leading-relaxed mb-4">
+                Goal: read data in a fair way. Use kind and respectful language. This topic can be personal for some classmates.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-6">
+                <div class="bg-white border rounded-lg p-3 text-slate-700"><strong>Class rule 1:</strong> Talk about data, not people in the room.</div>
+                <div class="bg-white border rounded-lg p-3 text-slate-700"><strong>Class rule 2:</strong> Use "some studies suggest..." not absolute statements.</div>
+                <div class="bg-white border rounded-lg p-3 text-slate-700"><strong>Class rule 3:</strong> It is OK to say "I am not sure yet."</div>
+                <div class="bg-white border rounded-lg p-3 text-slate-700"><strong>Class rule 4:</strong> Listen first, then challenge ideas politely.</div>
+            </div>
+
+            <div class="space-y-6">
+                <article class="bg-white border rounded-lg p-4">
+                    <h3 class="font-bold text-lg text-slate-800 mb-3">1) Referral Pattern Chart</h3>
+                    <label class="prompt-label" for="ws_referrals_observe">What do you see? (facts only)</label>
+                    <textarea id="ws_referrals_observe" class="student-input"
+                        placeholder="I can see that... / The number goes up from... to..."></textarea>
+                    <label class="prompt-label mt-3" for="ws_referrals_explain">What are two possible reasons?</label>
+                    <textarea id="ws_referrals_explain" class="student-input"
+                        placeholder="One possible reason is... Another possible reason is..."></textarea>
+                    <label class="prompt-label mt-3" for="ws_referrals_limits">What can this chart NOT tell us?</label>
+                    <textarea id="ws_referrals_limits" class="student-input"
+                        placeholder="This chart does not show... / We cannot say that..."></textarea>
+                </article>
+
+                <article class="bg-white border rounded-lg p-4">
+                    <h3 class="font-bold text-lg text-slate-800 mb-3">2) AFAB/AMAB and Age Charts</h3>
+                    <label class="prompt-label" for="ws_distribution_observe">What is the main pattern?</label>
+                    <textarea id="ws_distribution_observe" class="student-input"
+                        placeholder="The main pattern is... / Most referrals are in..."></textarea>
+                    <label class="prompt-label mt-3" for="ws_distribution_compare">How could country or clinic rules change these results?</label>
+                    <textarea id="ws_distribution_compare" class="student-input"
+                        placeholder="If the clinic uses different rules, then..."></textarea>
+                    <label class="prompt-label mt-3" for="ws_distribution_limits">What extra data do we need?</label>
+                    <textarea id="ws_distribution_limits" class="student-input"
+                        placeholder="We also need data about..."></textarea>
+                </article>
+
+                <article class="bg-white border rounded-lg p-4">
+                    <h3 class="font-bold text-lg text-slate-800 mb-3">3) Co-Occurring Indicators Chart</h3>
+                    <label class="prompt-label" for="ws_clinical_observe">What does the chart report?</label>
+                    <textarea id="ws_clinical_observe" class="student-input"
+                        placeholder="The chart reports that..."></textarea>
+                    <label class="prompt-label mt-3" for="ws_clinical_care">How can we discuss this in a respectful way?</label>
+                    <textarea id="ws_clinical_care" class="student-input"
+                        placeholder="A respectful way to say this is..."></textarea>
+                    <label class="prompt-label mt-3" for="ws_clinical_limits">Why does correlation not mean causation?</label>
+                    <textarea id="ws_clinical_limits" class="student-input"
+                        placeholder="Two things can happen together, but..."></textarea>
+                </article>
+
+                <article class="bg-white border rounded-lg p-4">
+                    <h3 class="font-bold text-lg text-slate-800 mb-3">4) Final Reflection</h3>
+                    <label class="prompt-label" for="ws_reflection_claim">Write one careful claim (max 2 sentences)</label>
+                    <textarea id="ws_reflection_claim" class="student-input"
+                        placeholder="Based on these data, we can say that..."></textarea>
+                    <label class="prompt-label mt-3" for="ws_reflection_change">What evidence could change your mind?</label>
+                    <textarea id="ws_reflection_change" class="student-input"
+                        placeholder="My view would change if I saw..."></textarea>
+                </article>
+            </div>
+        </section>
+
+        <section id="teacherPanel" class="worksheet-hidden mb-12 glass-card bg-teal-50 border border-teal-200 rounded-xl p-6">
+            <h2 class="text-2xl font-bold text-teal-900 mb-4">Teacher View: Lesson Guide (Age 15, CEFR B1)</h2>
+            <p class="text-sm text-slate-700 leading-relaxed mb-4">
+                Use this guide to support careful language, critical thinking, and student well-being. Keep the focus on data analysis, not personal identity.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-6">
+                <div class="bg-white border rounded-lg p-3 text-slate-700"><strong>Safety note:</strong> Students may pass on any question without explanation.</div>
+                <div class="bg-white border rounded-lg p-3 text-slate-700"><strong>Language note:</strong> Model neutral phrases like "this dataset suggests..."</div>
+                <div class="bg-white border rounded-lg p-3 text-slate-700"><strong>Discussion note:</strong> Challenge ideas, never people.</div>
+                <div class="bg-white border rounded-lg p-3 text-slate-700"><strong>Support note:</strong> Offer a private check-in option after class.</div>
+            </div>
+
+            <h3 class="font-bold text-lg text-teal-900 mb-3">Suggested 45-Minute Flow</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6 text-sm">
+                <div class="bg-white border rounded-lg p-3"><strong>0-5 min</strong><br>Set class rules and neutral language.</div>
+                <div class="bg-white border rounded-lg p-3"><strong>5-18 min</strong><br>Students complete Worksheet Parts 1-2 in pairs.</div>
+                <div class="bg-white border rounded-lg p-3"><strong>18-30 min</strong><br>Parts 3-4 and source check in groups of 3.</div>
+                <div class="bg-white border rounded-lg p-3"><strong>30-45 min</strong><br>Share revised claims and reflection.</div>
+            </div>
+
+            <h3 class="font-bold text-lg text-teal-900 mb-3">Grouping and Participation</h3>
+            <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1 mb-6">
+                <li>Use pairs first (safer speaking environment), then move to groups of three.</li>
+                <li>Assign rotating roles: Reader, Evidence Checker, Language Helper.</li>
+                <li>Allow written responses before speaking to support B1 learners.</li>
+                <li>Offer sentence frames on the board: "The chart shows...", "A limit is...", "Another explanation could be...".</li>
+            </ul>
+
+            <h3 class="font-bold text-lg text-teal-900 mb-3">Simple B1 Rubric (0-2 points each)</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm border border-slate-300 bg-white">
+                    <thead class="bg-slate-100 text-slate-700">
+                        <tr>
+                            <th class="text-left p-2 border border-slate-300">Criteria</th>
+                            <th class="text-left p-2 border border-slate-300">0</th>
+                            <th class="text-left p-2 border border-slate-300">1</th>
+                            <th class="text-left p-2 border border-slate-300">2</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-slate-700">
+                        <tr>
+                            <td class="p-2 border border-slate-300">Uses evidence</td>
+                            <td class="p-2 border border-slate-300">No data used</td>
+                            <td class="p-2 border border-slate-300">Some data used</td>
+                            <td class="p-2 border border-slate-300">Clear, correct data references</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border border-slate-300">Shows limits</td>
+                            <td class="p-2 border border-slate-300">No limits named</td>
+                            <td class="p-2 border border-slate-300">One limit named</td>
+                            <td class="p-2 border border-slate-300">Two or more limits explained</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border border-slate-300">Language level (B1)</td>
+                            <td class="p-2 border border-slate-300">Hard to understand</td>
+                            <td class="p-2 border border-slate-300">Mostly clear</td>
+                            <td class="p-2 border border-slate-300">Clear and well-structured</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border border-slate-300">Respectful communication</td>
+                            <td class="p-2 border border-slate-300">Unsafe wording</td>
+                            <td class="p-2 border border-slate-300">Usually respectful</td>
+                            <td class="p-2 border border-slate-300">Consistently respectful and careful</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold border-b-2 border-[#E11D48] inline-block mb-6">Historical Context & Referral
+                Patterns</h2>
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                Prior to 2010, many clinics reported lower annual referral counts and different age distributions.
+                Since then, pediatric referrals in several countries have increased. These figures describe service use
+                and cannot, on their own, establish prevalence in the wider population.
+            </p>
+            <div class="glass-card bg-white rounded-xl shadow-sm p-6 border">
+                <h3 class="text-center font-semibold mb-4 text-gray-600">Annual Referrals to Specialized Clinics
+                    (Aggregated)</h3>
+                <div class="chart-container">
+                    <canvas id="mainReferralChart"></canvas>
+                </div>
+                <p class="mt-6 text-xs text-gray-500 italic">Data Source: NHS GIDS Annual Reports (UK) & European
+                    Pediatric Registry Data (2010-2023).</p>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <section class="glass-card bg-white rounded-xl shadow-sm p-6 border">
+                <h2 class="text-xl font-bold text-[#1E3A8A] mb-4">Changes in AFAB/AMAB Distribution</h2>
+                <p class="text-sm text-gray-600 mb-6">Several published cohorts report a change in AFAB/AMAB
+                    distribution over time. Reported ratios vary by clinic, age range, and referral criteria.</p>
+                <div class="chart-container h-[250px]">
+                    <canvas id="demographicFlipChart"></canvas>
+                </div>
+            </section>
+
+            <section class="glass-card bg-white rounded-xl shadow-sm p-6 border">
+                <h2 class="text-xl font-bold text-[#1E3A8A] mb-4">Age Distribution in Referrals</h2>
+                <p class="text-sm text-gray-600 mb-6">In the datasets summarized here, referrals are concentrated in the
+                    adolescent years. This pattern may differ by period, region, and service structure.</p>
+                <div class="chart-container h-[250px] flex items-center justify-center">
+                    <canvas id="ageConcentrationChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold border-b-2 border-[#0D9488] inline-block mb-6">Co-Occurring Clinical Indicators
+            </h2>
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                Research, including the <strong>Cass Review (2024)</strong>, reports that some teenagers seeking
+                gender-related care also present with neurodevelopmental and mental health concerns. Reported rates
+                differ across studies and should be interpreted in context of study design and sampling methods.
+            </p>
+            <div class="glass-card bg-white rounded-xl shadow-sm p-8 border">
+                <div class="chart-container">
+                    <canvas id="comorbidityAnalysisChart"></canvas>
+                </div>
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                    <div class="p-4 bg-slate-50 rounded-lg">
+                        <strong>Neurodivergence:</strong> Studies indicate up to 35% of adolescent patients show traits
+                        of Autism Spectrum Disorder (ASD).
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-lg">
+                        <strong>Mental Health:</strong> Over 60% of patients report significant pre-existing anxiety or
+                        depressive disorders.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sources" class="mt-20 pt-10 border-t-2 border-gray-200">
+            <h2 class="text-2xl font-bold text-[#1E3A8A] mb-6">Sources & Academic References</h2>
+            <p class="mb-8 text-sm text-gray-600 leading-relaxed">
+                Neutrality note: this page is intended as an educational overview. It summarizes selected findings and
+                reported associations; it does not provide clinical guidance and does not establish causality.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Primary Clinical Reports
+                    </h4>
+                    <ul class="space-y-4">
+                        <li>
+                            <p class="font-semibold text-gray-800">The Cass Review (2024)</p>
+                            <p class="text-xs text-gray-500 mb-1">Independent review of gender identity services for
+                                children and young people.</p>
+                            <a href="https://cass.independent-review.uk/home/publications/final-report/" class="source-link"
+                                target="_blank" rel="noopener noreferrer">cass.independent-review.uk/home/publications/final-report/</a>
+                        </li>
+                        <li>
+                            <p class="font-semibold text-gray-800">NHS GIDS Annual Data</p>
+                            <p class="text-xs text-gray-500 mb-1">Referral statistics for the Gender Identity
+                                Development Service (UK).</p>
+                            <a href="https://web.archive.org/web/20180119190811/https://gids.nhs.uk/number-referrals"
+                                class="source-link" target="_blank" rel="noopener noreferrer">web.archive.org/.../gids.nhs.uk/number-referrals</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">International Studies
+                    </h4>
+                    <ul class="space-y-4">
+                        <li>
+                            <p class="font-semibold text-gray-800">The "Dutch Protocol" (de Vries et al., 2011)</p>
+                            <p class="text-xs text-gray-500 mb-1">Foundational research on puberty blockers in
+                                adolescent-onset dysphoria.</p>
+                            <a href="https://doi.org/10.1111/j.1743-6109.2010.01943.x" class="source-link"
+                                target="_blank" rel="noopener noreferrer">DOI: 10.1111/j.1743-6109.2010.01943.x</a>
+                        </li>
+                        <li>
+                            <p class="font-semibold text-gray-800">Zucker et al. (2021)</p>
+                            <p class="text-xs text-gray-500 mb-1">Review of shifting sex ratios in gender clinics across
+                                multiple Western countries.</p>
+                            <p class="source-link no-underline text-gray-500">Citation link under verification.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <dialog id="teacherPasswordDialog" class="teacher-dialog">
+        <form id="teacherPasswordForm" method="dialog" class="p-5">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Teacher Access</h3>
+            <p class="text-sm text-slate-600 mb-4">Enter password to open Teacher View.</p>
+            <label for="teacherPasswordInput" class="prompt-label">Password</label>
+            <input id="teacherPasswordInput" type="password"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]"
+                autocomplete="current-password" required>
+            <p id="teacherPasswordError" class="text-sm text-red-600 min-h-[1.25rem] mb-3"></p>
+            <div class="flex justify-end gap-2">
+                <button type="button" id="teacherPasswordCancel"
+                    class="px-3 py-2 rounded-lg text-sm font-semibold border border-slate-300 text-slate-700 hover:bg-slate-100">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="px-3 py-2 rounded-lg text-sm font-semibold bg-[#1E3A8A] text-white hover:bg-blue-800">
+                    Unlock
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <footer class="bg-gray-100 py-12 px-8 text-center text-gray-500 border-t">
+        <p class="text-sm">Research compiled for educational analysis. This page summarizes selected evidence and
+            methodological limits. © 2024 Demographic Research Initiative.</p>
+        <p class="text-[10px] mt-2 italic no-print">Printed copies of this document maintain data integrity for clinical
+            or academic review.</p>
+    </footer>
+
+    <script>
+        const chartPlugins = {
+            tooltip: {
+                callbacks: {
+                    title: function (tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        return Array.isArray(label) ? label.join(' ') : label;
+                    }
+                }
+            }
+        };
+
+        const standardScales = {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter' } } },
+            x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }
+        };
+
+        const ctx1 = document.getElementById('mainReferralChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['2010', '2012', '2014', '2016', '2018', '2020', '2022'],
+                datasets: [{
+                    label: 'Clinical Referrals (Indexed)',
+                    data: [100, 160, 420, 1200, 2400, 3900, 5200],
+                    borderColor: '#1E3A8A',
+                    backgroundColor: 'rgba(30, 58, 138, 0.05)',
+                    fill: true,
+                    tension: 0.3,
+                    borderWidth: 3,
+                    pointRadius: 4
+                }]
+            },
+            options: { maintainAspectRatio: false, plugins: chartPlugins, scales: standardScales }
+        });
+
+        const ctx2 = document.getElementById('demographicFlipChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Pre-2010', '2015-2017', '2020-Present'],
+                datasets: [
+                    { label: 'AFAB (Natal Female)', data: [28, 55, 76], backgroundColor: '#E11D48' },
+                    { label: 'AMAB (Natal Male)', data: [72, 45, 24], backgroundColor: '#1E3A8A' }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, max: 100, ticks: { callback: v => v + '%' } }
+                },
+                plugins: chartPlugins
+            }
+        });
+
+        const ctx3 = document.getElementById('ageConcentrationChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'doughnut',
+            data: {
+                labels: [['Pre-Pubertal', '(Under 11)'], ['Adolescents', '(Age 12-17)'], ['Young Adults', '(Age 18-24)']],
+                datasets: [{
+                    data: [12, 73, 15],
+                    backgroundColor: ['#94A3B8', '#E11D48', '#0D9488'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: { ...chartPlugins, legend: { position: 'bottom' } }
+            }
+        });
+
+        const ctx4 = document.getElementById('comorbidityAnalysisChart').getContext('2d');
+        new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: [
+                    ['Neurodivergent', 'Traits (ASD)'],
+                    ['Anxiety &', 'Panic Disorders'],
+                    ['Depressive', 'Symptoms'],
+                    ['Eating', 'Disorders']
+                ],
+                datasets: [{
+                    label: 'Prevalence in Clinic Cohort (%)',
+                    data: [34, 62, 58, 18],
+                    backgroundColor: '#0D9488',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                maintainAspectRatio: false,
+                scales: {
+                    x: { max: 100, ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false } }
+                },
+                plugins: chartPlugins
+            }
+        });
+
+        const worksheetStorageKey = 'genderIdentityWorksheetB1';
+        const teacherAccessStorageKey = 'teacherViewUnlocked';
+        const teacherPassword = 'te@cher';
+        const worksheetPanel = document.getElementById('worksheetPanel');
+        const toggleWorksheetBtn = document.getElementById('toggleWorksheetBtn');
+        const teacherPanel = document.getElementById('teacherPanel');
+        const toggleTeacherBtn = document.getElementById('toggleTeacherBtn');
+        const downloadAnswersBtn = document.getElementById('downloadAnswersBtn');
+        const clearAnswersBtn = document.getElementById('clearAnswersBtn');
+        const teacherPasswordDialog = document.getElementById('teacherPasswordDialog');
+        const teacherPasswordForm = document.getElementById('teacherPasswordForm');
+        const teacherPasswordInput = document.getElementById('teacherPasswordInput');
+        const teacherPasswordCancel = document.getElementById('teacherPasswordCancel');
+        const teacherPasswordError = document.getElementById('teacherPasswordError');
+        const worksheetInputs = Array.from(document.querySelectorAll('.student-input'));
+
+        function getWorksheetData() {
+            const data = {};
+            worksheetInputs.forEach((input) => {
+                data[input.id] = input.value.trim();
+            });
+            return data;
+        }
+
+        function saveWorksheetData() {
+            localStorage.setItem(worksheetStorageKey, JSON.stringify(getWorksheetData()));
+        }
+
+        function loadWorksheetData() {
+            const raw = localStorage.getItem(worksheetStorageKey);
+            if (!raw) return;
+            try {
+                const saved = JSON.parse(raw);
+                worksheetInputs.forEach((input) => {
+                    if (typeof saved[input.id] === 'string') {
+                        input.value = saved[input.id];
+                    }
+                });
+            } catch (error) {
+                console.warn('Worksheet save data is not valid JSON.');
+            }
+        }
+
+        function updateWorksheetButtonLabel() {
+            const isOpen = !worksheetPanel.classList.contains('worksheet-hidden');
+            toggleWorksheetBtn.textContent = isOpen ? 'Hide Worksheet' : 'Worksheet Mode';
+        }
+
+        function updateTeacherButtonLabel() {
+            const isOpen = !teacherPanel.classList.contains('worksheet-hidden');
+            toggleTeacherBtn.textContent = isOpen ? 'Hide Teacher View' : 'Teacher View';
+        }
+
+        function hasTeacherAccess() {
+            return sessionStorage.getItem(teacherAccessStorageKey) === 'true';
+        }
+
+        function requestTeacherAccess() {
+            return new Promise((resolve) => {
+                teacherPasswordError.textContent = '';
+                teacherPasswordInput.value = '';
+                teacherPasswordDialog.showModal();
+                teacherPasswordInput.focus();
+
+                function cleanup() {
+                    teacherPasswordForm.removeEventListener('submit', handleSubmit);
+                    teacherPasswordCancel.removeEventListener('click', handleCancel);
+                    teacherPasswordDialog.removeEventListener('cancel', handleCancel);
+                    teacherPasswordDialog.removeEventListener('close', handleClose);
+                }
+
+                function handleSubmit(event) {
+                    event.preventDefault();
+                    if (teacherPasswordInput.value === teacherPassword) {
+                        sessionStorage.setItem(teacherAccessStorageKey, 'true');
+                        cleanup();
+                        teacherPasswordDialog.close();
+                        resolve(true);
+                        return;
+                    }
+                    teacherPasswordError.textContent = 'Wrong password.';
+                    teacherPasswordInput.select();
+                }
+
+                function handleCancel() {
+                    cleanup();
+                    teacherPasswordDialog.close();
+                    resolve(false);
+                }
+
+                function handleClose() {
+                    cleanup();
+                    resolve(false);
+                }
+
+                teacherPasswordForm.addEventListener('submit', handleSubmit);
+                teacherPasswordCancel.addEventListener('click', handleCancel);
+                teacherPasswordDialog.addEventListener('cancel', handleCancel);
+                teacherPasswordDialog.addEventListener('close', handleClose);
+            });
+        }
+
+        async function downloadWorksheetPdf() {
+            const originalLabel = downloadAnswersBtn.textContent;
+            const wasWorksheetHidden = worksheetPanel.classList.contains('worksheet-hidden');
+
+            try {
+                downloadAnswersBtn.disabled = true;
+                downloadAnswersBtn.textContent = 'Generating PDF...';
+
+                if (wasWorksheetHidden) {
+                    worksheetPanel.classList.remove('worksheet-hidden');
+                    updateWorksheetButtonLabel();
+                    await new Promise((resolve) => setTimeout(resolve, 120));
+                }
+
+                const mainEl = document.querySelector('main');
+                const canvas = await html2canvas(mainEl, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = pageWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                let heightLeft = imgHeight;
+                let position = 0;
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save('student-worksheet-and-charts.pdf');
+            } catch (error) {
+                console.error('PDF generation failed:', error);
+                window.alert('Could not generate PDF on this device. Please try again.');
+            } finally {
+                if (wasWorksheetHidden) {
+                    worksheetPanel.classList.add('worksheet-hidden');
+                    updateWorksheetButtonLabel();
+                }
+                downloadAnswersBtn.disabled = false;
+                downloadAnswersBtn.textContent = originalLabel;
+            }
+        }
+
+        toggleWorksheetBtn.addEventListener('click', () => {
+            worksheetPanel.classList.toggle('worksheet-hidden');
+            updateWorksheetButtonLabel();
+        });
+
+        toggleTeacherBtn.addEventListener('click', async () => {
+            const isClosed = teacherPanel.classList.contains('worksheet-hidden');
+            if (isClosed && !hasTeacherAccess() && !(await requestTeacherAccess())) {
+                return;
+            }
+            teacherPanel.classList.toggle('worksheet-hidden');
+            updateTeacherButtonLabel();
+        });
+
+        downloadAnswersBtn.addEventListener('click', downloadWorksheetPdf);
+
+        clearAnswersBtn.addEventListener('click', () => {
+            const shouldClear = window.confirm('Clear all worksheet answers saved in this browser?');
+            if (!shouldClear) return;
+            worksheetInputs.forEach((input) => {
+                input.value = '';
+            });
+            localStorage.removeItem(worksheetStorageKey);
+        });
+
+        worksheetInputs.forEach((input) => {
+            input.addEventListener('input', saveWorksheetData);
+        });
+
+        loadWorksheetData();
+        updateWorksheetButtonLabel();
+        updateTeacherButtonLabel();
+    </script>
+</body>
+
+</html>
