@@ -6,7 +6,6 @@
     <title>Printable Report: Adolescent Gender Identity Data Overview</title>
     <link rel="stylesheet" href="./styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
@@ -255,7 +254,12 @@
         </p>
       </section>
       <section id="teacherPanel" class="worksheet-hidden mb-12 glass-card bg-teal-50 border border-teal-200 rounded-xl p-6">
-        <h2 class="text-2xl font-bold text-teal-900 mb-4">Teacher View: Lesson Guide (Age 15, CEFR B1)</h2>
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h2 class="text-2xl font-bold text-teal-900">Teacher View: Lesson Guide (Age 15, CEFR B1)</h2>
+          <button id="downloadModelSolutionsBtn" class="bg-teal-700 text-white px-3 py-2 rounded-lg font-semibold text-sm hover:bg-teal-800 transition-colors">
+            Download Model Solutions
+          </button>
+        </div>
         <p class="text-sm text-slate-700 leading-relaxed mb-4">
           Use this guide to support careful language, critical thinking, and student well-being. Keep the focus on data analysis, not personal identity.
         </p>
@@ -346,25 +350,8 @@
           <textarea id="ws_referrals_limits" class="student-input" placeholder="This chart does not show... / We cannot say that..."></textarea>
         </article>
       </section>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-        <section class="glass-card bg-white rounded-xl shadow-sm p-6 border">
-          <h2 class="text-xl font-bold text-[#1E3A8A] mb-4">Changes in AFAB/AMAB Distribution</h2>
-          <p class="text-sm text-gray-600 mb-6">Several published cohorts report a change in AFAB/AMAB
-            distribution over time. Reported ratios vary by clinic, age range, and referral criteria.</p>
-          <div class="chart-container h-[250px]">
-            <canvas id="demographicFlipChart"></canvas>
-          </div>
-          <article class="worksheet-content worksheet-hidden mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <h3 class="font-bold text-base text-slate-800 mb-3">Worksheet Prompt: AFAB/AMAB</h3>
-            <label class="prompt-label" for="ws_distribution_observe">What is the main pattern?</label>
-            <textarea id="ws_distribution_observe" class="student-input" placeholder="The main pattern is... / Most referrals are in..."></textarea>
-            <label class="prompt-label mt-3" for="ws_distribution_compare">How could country or clinic rules change these results?</label>
-            <textarea id="ws_distribution_compare" class="student-input" placeholder="If the clinic uses different rules, then..."></textarea>
-            <label class="prompt-label mt-3" for="ws_distribution_limits">What extra data do we need?</label>
-            <textarea id="ws_distribution_limits" class="student-input" placeholder="We also need data about..."></textarea>
-          </article>
-        </section>
-        <section class="glass-card bg-white rounded-xl shadow-sm p-6 border">
+      <section class="mb-16">
+        <div class="glass-card bg-white rounded-xl shadow-sm p-6 border">
           <h2 class="text-xl font-bold text-[#1E3A8A] mb-4">Age Distribution in Referrals</h2>
           <p class="text-sm text-gray-600 mb-6">In the datasets summarized here, referrals are concentrated in the
             adolescent years. This pattern may differ by period, region, and service structure.</p>
@@ -378,40 +365,7 @@
             <label class="prompt-label mt-3" for="ws_age_limits">What extra data do we need to compare age groups better?</label>
             <textarea id="ws_age_limits" class="student-input" placeholder="We also need data about..."></textarea>
           </article>
-        </section>
-      </div>
-      <section class="mb-16">
-        <h2 class="text-2xl font-bold border-b-2 border-[#0D9488] inline-block mb-6">Co-Occurring Clinical Indicators
-        </h2>
-        <p class="mb-8 text-gray-700 leading-relaxed">
-          Research, including the <strong>Cass Review (2024)</strong>, reports that some teenagers seeking
-          gender-related care also present with neurodevelopmental and mental health concerns. Reported rates
-          differ across studies and should be interpreted in context of study design and sampling methods.
-        </p>
-        <div class="glass-card bg-white rounded-xl shadow-sm p-8 border">
-          <div class="chart-container">
-            <canvas id="comorbidityAnalysisChart"></canvas>
-          </div>
-          <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <div class="p-4 bg-slate-50 rounded-lg">
-              <strong>Neurodivergence:</strong> Studies indicate up to 35% of adolescent patients show traits
-              of Autism Spectrum Disorder (ASD).
-            </div>
-            <div class="p-4 bg-slate-50 rounded-lg">
-              <strong>Mental Health:</strong> Over 60% of patients report significant pre-existing anxiety or
-              depressive disorders.
-            </div>
-          </div>
         </div>
-        <article class="worksheet-content worksheet-hidden mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <h3 class="font-bold text-lg text-slate-800 mb-3">Worksheet Prompt: Co-Occurring Indicators</h3>
-          <label class="prompt-label" for="ws_clinical_observe">What does the chart report?</label>
-          <textarea id="ws_clinical_observe" class="student-input" placeholder="The chart reports that..."></textarea>
-          <label class="prompt-label mt-3" for="ws_clinical_care">How can we discuss this in a respectful way?</label>
-          <textarea id="ws_clinical_care" class="student-input" placeholder="A respectful way to say this is..."></textarea>
-          <label class="prompt-label mt-3" for="ws_clinical_limits">Why does correlation not mean causation?</label>
-          <textarea id="ws_clinical_limits" class="student-input" placeholder="Two things can happen together, but..."></textarea>
-        </article>
       </section>
       <section class="worksheet-content worksheet-hidden mb-16 glass-card bg-amber-50 border border-amber-200 rounded-xl p-6">
         <h3 class="font-bold text-xl text-slate-800 mb-3">Final Reflection</h3>
@@ -445,24 +399,7 @@
               </li>
             </ul>
           </div>
-          <div>
-            <h4 class="font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">International Studies
-            </h4>
-            <ul class="space-y-4">
-              <li>
-                <p class="font-semibold text-gray-800">The "Dutch Protocol" (de Vries et al., 2011)</p>
-                <p class="text-xs text-gray-500 mb-1">Foundational research on puberty blockers in
-                  adolescent-onset dysphoria.</p>
-                <a href="https://doi.org/10.1111/j.1743-6109.2010.01943.x" class="source-link" target="_blank" rel="noopener noreferrer">DOI: 10.1111/j.1743-6109.2010.01943.x</a>
-              </li>
-              <li>
-                <p class="font-semibold text-gray-800">Zucker et al. (2021)</p>
-                <p class="text-xs text-gray-500 mb-1">Review of shifting sex ratios in gender clinics across
-                  multiple Western countries.</p>
-                <p class="source-link no-underline text-gray-500">Citation link under verification.</p>
-              </li>
-            </ul>
-          </div>
+          <div></div>
         </div>
       </section>
     </main>
@@ -546,43 +483,6 @@
           scales: standardScales
         }
       });
-      const ctx2 = document.getElementById('demographicFlipChart').getContext('2d');
-      new Chart(ctx2, {
-        type: 'bar',
-        data: {
-          labels: ['Pre-2010', '2015-2017', '2020-Present'],
-          datasets: [{
-              label: 'AFAB (Natal Female)',
-              data: [28, 55, 76],
-              backgroundColor: '#E11D48'
-            },
-            {
-              label: 'AMAB (Natal Male)',
-              data: [72, 45, 24],
-              backgroundColor: '#1E3A8A'
-            }
-          ]
-        },
-        options: {
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              stacked: true,
-              grid: {
-                display: false
-              }
-            },
-            y: {
-              stacked: true,
-              max: 100,
-              ticks: {
-                callback: v => v + '%'
-              }
-            }
-          },
-          plugins: chartPlugins
-        }
-      });
       const ctx3 = document.getElementById('ageConcentrationChart').getContext('2d');
       new Chart(ctx3, {
         type: 'doughnut',
@@ -608,42 +508,6 @@
           }
         }
       });
-      const ctx4 = document.getElementById('comorbidityAnalysisChart').getContext('2d');
-      new Chart(ctx4, {
-        type: 'bar',
-        data: {
-          labels: [
-            ['Neurodivergent', 'Traits (ASD)'],
-            ['Anxiety &', 'Panic Disorders'],
-            ['Depressive', 'Symptoms'],
-            ['Eating', 'Disorders']
-          ],
-          datasets: [{
-            label: 'Prevalence in Clinic Cohort (%)',
-            data: [34, 62, 58, 18],
-            backgroundColor: '#0D9488',
-            borderRadius: 4
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              max: 100,
-              ticks: {
-                callback: v => v + '%'
-              }
-            },
-            y: {
-              grid: {
-                display: false
-              }
-            }
-          },
-          plugins: chartPlugins
-        }
-      });
       const worksheetStorageKey = 'genderIdentityWorksheetB1';
       const teacherAccessStorageKey = 'teacherViewUnlocked';
       const teacherPassword = 'te@cher';
@@ -654,6 +518,7 @@
       const toggleTeacherBtn = document.getElementById('toggleTeacherBtn');
       const downloadAnswersBtn = document.getElementById('downloadAnswersBtn');
       const clearAnswersBtn = document.getElementById('clearAnswersBtn');
+      const downloadModelSolutionsBtn = document.getElementById('downloadModelSolutionsBtn');
       const teacherPasswordDialog = document.getElementById('teacherPasswordDialog');
       const teacherPasswordForm = document.getElementById('teacherPasswordForm');
       const teacherPasswordInput = document.getElementById('teacherPasswordInput');
@@ -741,51 +606,174 @@
       }
       async function downloadWorksheetPdf() {
         const originalLabel = downloadAnswersBtn.textContent;
-        const wasWorksheetHidden = worksheetSections.every((section) => section.classList.contains('worksheet-hidden'));
         try {
           downloadAnswersBtn.disabled = true;
           downloadAnswersBtn.textContent = 'Generating PDF...';
-          if (wasWorksheetHidden) {
-            setWorksheetVisibility(true);
-            updateWorksheetButtonLabel();
-            await new Promise((resolve) => setTimeout(resolve, 120));
-          }
-          const mainEl = document.querySelector('main');
-          const canvas = await html2canvas(mainEl, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff'
-          });
-          const {
-            jsPDF
-          } = window.jspdf;
+
+          const { jsPDF } = window.jspdf;
           const pdf = new jsPDF('p', 'mm', 'a4');
           const pageWidth = pdf.internal.pageSize.getWidth();
           const pageHeight = pdf.internal.pageSize.getHeight();
-          const imgWidth = pageWidth;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-          let heightLeft = imgHeight;
-          let position = 0;
-          const imgData = canvas.toDataURL('image/jpeg', 0.95);
-          pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-          while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-          }
+          const margin = 12;
+          const maxWidth = pageWidth - margin * 2;
+          let y = margin;
+
+          const ensureSpace = (needed = 10) => {
+            if (y + needed > pageHeight - margin) {
+              pdf.addPage();
+              y = margin;
+            }
+          };
+
+          const writeBlock = (title, content) => {
+            ensureSpace(18);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(12);
+            pdf.text(title, margin, y);
+            y += 6;
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(10);
+            const lines = pdf.splitTextToSize(content || '[No answer]', maxWidth);
+            lines.forEach((line) => {
+              ensureSpace(6);
+              pdf.text(line, margin, y);
+              y += 5;
+            });
+            y += 2;
+          };
+
+          const addChart = (title, canvasId) => {
+            const canvasEl = document.getElementById(canvasId);
+            if (!canvasEl) return;
+            ensureSpace(16);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(12);
+            pdf.text(title, margin, y);
+            y += 6;
+
+            const imgData = canvasEl.toDataURL('image/png', 1.0);
+            const chartRatio = canvasEl.height / canvasEl.width;
+            const chartWidth = maxWidth;
+            const chartHeight = Math.min(90, chartWidth * chartRatio);
+            ensureSpace(chartHeight + 4);
+            pdf.addImage(imgData, 'PNG', margin, y, chartWidth, chartHeight);
+            y += chartHeight + 4;
+          };
+
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(16);
+          pdf.text('Student Worksheet and Charts', margin, y);
+          y += 8;
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(10);
+          pdf.text(`Exported: ${new Date().toLocaleString()}`, margin, y);
+          y += 8;
+
+          addChart('Chart 1: Annual Referrals', 'mainReferralChart');
+          addChart('Chart 2: Age Distribution in Referrals', 'ageConcentrationChart');
+
+          const answers = getWorksheetData();
+          writeBlock('1) What do you see? (facts only)', answers.ws_referrals_observe);
+          writeBlock('2) Two possible reasons', answers.ws_referrals_explain);
+          writeBlock('3) Limits of referral chart', answers.ws_referrals_limits);
+          writeBlock('4) Main age pattern', answers.ws_age_observe);
+          writeBlock('5) Extra age data needed', answers.ws_age_limits);
+          writeBlock('6) Final careful claim', answers.ws_reflection_claim);
+          writeBlock('7) Evidence that could change your mind', answers.ws_reflection_change);
+
           pdf.save('student-worksheet-and-charts.pdf');
         } catch (error) {
           console.error('PDF generation failed:', error);
           window.alert('Could not generate PDF on this device. Please try again.');
         } finally {
-          if (wasWorksheetHidden) {
-            setWorksheetVisibility(false);
-            updateWorksheetButtonLabel();
-          }
           downloadAnswersBtn.disabled = false;
           downloadAnswersBtn.textContent = originalLabel;
+        }
+      }
+
+      async function downloadModelSolutions() {
+        const originalLabel = downloadModelSolutionsBtn.textContent;
+        try {
+          downloadModelSolutionsBtn.disabled = true;
+          downloadModelSolutionsBtn.textContent = 'Generating PDF...';
+
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const margin = 12;
+          const maxWidth = pageWidth - margin * 2;
+          let y = margin;
+
+          const ensureSpace = (needed = 10) => {
+            if (y + needed > pageHeight - margin) {
+              pdf.addPage();
+              y = margin;
+            }
+          };
+
+          const addChart = (title, canvasId) => {
+            const canvasEl = document.getElementById(canvasId);
+            if (!canvasEl) return;
+            ensureSpace(16);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(12);
+            pdf.text(title, margin, y);
+            y += 6;
+
+            const imgData = canvasEl.toDataURL('image/png', 1.0);
+            const chartRatio = canvasEl.height / canvasEl.width;
+            const chartWidth = maxWidth;
+            const chartHeight = Math.min(90, chartWidth * chartRatio);
+            ensureSpace(chartHeight + 4);
+            pdf.addImage(imgData, 'PNG', margin, y, chartWidth, chartHeight);
+            y += chartHeight + 4;
+          };
+
+          const writeBlock = (title, content) => {
+            ensureSpace(18);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(12);
+            pdf.text(title, margin, y);
+            y += 6;
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(10);
+            const lines = pdf.splitTextToSize(content, maxWidth);
+            lines.forEach((line) => {
+              ensureSpace(6);
+              pdf.text(line, margin, y);
+              y += 5;
+            });
+            y += 2;
+          };
+
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(16);
+          pdf.text('Teacher Model Solutions and Charts', margin, y);
+          y += 8;
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(10);
+          pdf.text(`Exported: ${new Date().toLocaleString()}`, margin, y);
+          y += 8;
+
+          addChart('Chart 1: Annual Referrals', 'mainReferralChart');
+          addChart('Chart 2: Age Distribution in Referrals', 'ageConcentrationChart');
+
+          writeBlock('1) What do you see? (facts only)', 'Model answer: Referrals increase across all shown years, from around 100 (2010) to over 5000 (2022) in this indexed dataset.');
+          writeBlock('2) Two possible reasons', 'Model answer: One reason could be changes in service access and awareness. Another reason could be changes in referral pathways and reporting practices.');
+          writeBlock('3) Limits of referral chart', 'Model answer: This chart shows service referrals, not total population prevalence. It does not prove one single cause.');
+          writeBlock('4) Main age pattern', 'Model answer: The largest share in this chart is ages 12-17. Under-11 and 18-24 groups are smaller.');
+          writeBlock('5) Extra age data needed', 'Model answer: We need comparable data by country, clinic criteria, and year to make stronger comparisons.');
+          writeBlock('6) Final careful claim', 'Model answer: Based on these charts, referral patterns changed over time and are concentrated in adolescence in this dataset.');
+          writeBlock('7) Evidence that could change your mind', 'Model answer: My view would change with larger multi-country datasets using consistent definitions over time.');
+
+          pdf.save('teacher-model-solutions-and-charts.pdf');
+        } catch (error) {
+          console.error('Teacher PDF generation failed:', error);
+          window.alert('Could not generate teacher PDF on this device. Please try again.');
+        } finally {
+          downloadModelSolutionsBtn.disabled = false;
+          downloadModelSolutionsBtn.textContent = originalLabel;
         }
       }
       toggleWorksheetBtn.addEventListener('click', () => {
@@ -802,6 +790,7 @@
         updateTeacherButtonLabel();
       });
       downloadAnswersBtn.addEventListener('click', downloadWorksheetPdf);
+      downloadModelSolutionsBtn.addEventListener('click', downloadModelSolutions);
       clearAnswersBtn.addEventListener('click', () => {
         const shouldClear = window.confirm('Clear all worksheet answers saved in this browser?');
         if (!shouldClear) return;
